@@ -53,7 +53,7 @@ class CanvasFrame(wx.Frame):
         self.buttons.append(wx.Button(self, -1, "newton iteration")) #0
         self.buttons.append(wx.Button(self, -1, "enter iteration")) #1
         self.buttons.append(wx.Button(self, -1, "update")) #2
-        self.buttons.append(wx.Button(self, -1, "prec")) #3
+        self.buttons.append(wx.Button(self, -1, "precision")) #3
         self.buttons.append(wx.Button(self, -1, "range")) #4
         
         for i in range(0, len(self.buttons)):
@@ -108,88 +108,22 @@ class CanvasFrame(wx.Frame):
             Xm, Ym, Z, levels, i = JS_grids(self.n,tol,maxit,Nx,Ny,self.xlims,self.ylims)
             
             self.ax.contourf(Xm,Ym,Z, cmap=plt.cm.get_cmap('jet',len(levels)-1))
+            # Store some values to see if we have to update
+            self.cprec0 = self.cprec
+            self.xaxes0 = self.ax.get_xlim()
+            self.yaxes0 = self.ax.get_ylim()
+            # Draw on the canvas
             self.canvas.draw() 
             self.js = 0
             if i == maxit:
                 self.statusbar.SetStatusText('Maximal number ('+str(i)+') of iterations reached')
             else:
                 self.statusbar.SetStatusText(str(i)+' Iterations needed')  
-
-    # function where user can enter number of pixels in x and y direction
-    def NxNy(self,event):
-        ''' Set precision '''
-        self.statusbar.SetStatusText("")
-        precBox = wx.TextEntryDialog(None, 'Number of Pixels', 'Enter number', '')
-
-        if precBox.ShowModal() == wx.ID_OK:
-            self.cprec = int(precBox.GetValue())
-            if self.cprec < 2:
-                self.statusbar.SetStatusText("Please select a meaningful Number")
-                self.cprec = 100
-
-    # set x and y range
-    def xylims(self,event):
-        self.statusbar.SetStatusText("")
-        xlimBox = wx.TextEntryDialog(None, 'x limits (f.e. -2,2)', 'Enter number (delimiter is ,)', '')
-        if  xlimBox.ShowModal() == wx.ID_OK:
-            x_lims = str(xlimBox.GetValue())
-            x_lims = x_lims.split(',')
-            xmin = float(x_lims[0])
-            xmax = float(x_lims[1])
-            self.xlims = np.array([xmin,xmax])
-            
-        ylimBox = wx.TextEntryDialog(None, 'y limits (f.e. -2,2)', 'Enter number (delimiter is ,)', '')
-        if ylimBox.ShowModal() == wx.ID_OK:
-            y_lims = str(ylimBox.GetValue())
-            y_lims = y_lims.split(',')
-            ymin = float(y_lims[0])
-            ymax = float(y_lims[1])
-            self.ylims = np.array([ymin,ymax])
-
-    # updates our current plot if we use the zoom/change prec
-    def update(self,event):
-        if  self.ax == None:
-            self.statusbar.SetStatusText("Error: No image to update")
-        if  self.js == 0:
-            self.statusbar.SetStatusText("")  
-            xaxes = self.ax.get_xlim()
-            yaxes = self.ax.get_ylim()
-            self.ax.cla()
-            xlimsu = np.array(xaxes)
-            ylimsu = np.array(yaxes)
-            maxit = 50 # number of iterations
-            lxy = (len(self.xlims)+len(self.ylims))
-            tol = lxy*1e-4 # toleranz for termination criterium
-            Nx = self.cprec   # mesh points in x-direction
-            Ny = self.cprec   # mesh points in y-direction
-            Xm, Ym, Z, levels, i = JS_grids(self.n,tol,maxit,Nx,Ny,xlimsu,ylimsu)
-            self.ax.contourf(Xm,Ym,Z, cmap=plt.cm.get_cmap('jet',len(levels)-1))
-            self.canvas.draw()
-            if i == maxit:
-                self.statusbar.SetStatusText('Maximal number ('+str(i)+') of iterations reached')
-            else:
-                self.statusbar.SetStatusText(str(i)+' Iterations needed')
-        if  self.js == 1:
-            self.statusbar.SetStatusText("")  
-            xaxes = self.ax.get_xlim()
-            yaxes = self.ax.get_ylim()
-            self.ax.cla()
-            xlimsu = np.array(xaxes)
-            ylimsu = np.array(yaxes)
-            Nx = self.cprec   # mesh points in x-direction
-            Ny = self.cprec   # mesh points in y-direction
-            Xm, Ym, Z = JS_gridsui(func,Nx,Ny,xlimsu,ylimsu)
-            
-            levels = np.array([0,1,2])
-            self.ax.contourf(Xm,Ym,Z,levels=levels,colors=('w', 'b'))
-            #plt.colorbar()
-            self.canvas.draw() 
-
+    
     # function that uses the scipy parser to transform user input into usable function
     def user_ip(self,event):
         ''' plot some Julia Sets '''
-        self.ax = self.figure.add_subplot(111)
-        self.ax.cla()
+
         uiBox = wx.TextEntryDialog(None, 'Iteration for complex variable', 'f(z) = ?', '')
 
         if uiBox.ShowModal() == wx.ID_OK:
@@ -204,15 +138,113 @@ class CanvasFrame(wx.Frame):
             self.statusbar.SetStatusText("Error: Enter a number")
         else:
             self.statusbar.SetStatusText("")
+            self.ax = self.figure.add_subplot(111)
+            self.ax.cla()
             Nx = self.cprec   # mesh points in x-direction
             Ny = self.cprec   # mesh points in y-direction
             Xm, Ym, Z = JS_gridsui(f,Nx,Ny,self.xlims,self.ylims)
             
             levels = np.array([0,1,2])
             self.ax.contourf(Xm,Ym,Z,levels=levels,colors=('w', 'b'))
-            #plt.colorbar()
+            # Store some values to see if we have to update
+            self.cprec0 = self.cprec
+            self.xaxes0 = self.ax.get_xlim()
+            self.yaxes0 = self.ax.get_ylim()
+            # Draw on the canvas
             self.canvas.draw() 
             self.js = 1
+
+    # updates our current plot if we use the zoom/change prec
+    def update(self,event):
+        if  self.ax == None:
+            self.statusbar.SetStatusText("Error: No image to update")
+        elif  self.js == 0:
+            self.statusbar.SetStatusText("")  
+                
+            xaxes = self.ax.get_xlim()
+            yaxes = self.ax.get_ylim()
+            # See if there is something to update
+            if (xaxes == self.xaxes0 and yaxes == self.yaxes0 and self.cprec0 == self.cprec):
+                self.statusbar.SetStatusText("Nothing to update")
+                return 
+            self.ax.cla()
+            xlimsu = np.array(xaxes)
+            ylimsu = np.array(yaxes)
+            maxit = 50 # number of iterations
+            lxy = (len(self.xlims)+len(self.ylims))
+            tol = lxy*1e-4 # toleranz for termination criterium
+            Nx = self.cprec   # mesh points in x-direction
+            Ny = self.cprec   # mesh points in y-direction
+            Xm, Ym, Z, levels, i = JS_grids(self.n,tol,maxit,Nx,Ny,xlimsu,ylimsu)
+            self.ax.contourf(Xm,Ym,Z, cmap=plt.cm.get_cmap('jet',len(levels)-1))
+            # Store some values to see if we have to update
+            self.xaxes0 = xaxes
+            self.yaxes0 = yaxes
+            self.cprec0 = self.cprec
+            # Draw on the canvas
+            self.canvas.draw()
+            if i == maxit:
+                self.statusbar.SetStatusText('Maximal number ('+str(i)+') of iterations reached')
+            else:
+                self.statusbar.SetStatusText(str(i)+' Iterations needed')
+        elif  self.js == 1:
+            self.statusbar.SetStatusText("")  
+            xaxes = self.ax.get_xlim()
+            yaxes = self.ax.get_ylim()
+            # See if there is something to update
+            if (xaxes == self.xaxes0 and yaxes == self.yaxes0 and self.cprec0 == self.cprec):
+                self.statusbar.SetStatusText("Nothing to update")
+                return 
+            self.ax.cla()
+            xlimsu = np.array(xaxes)
+            ylimsu = np.array(yaxes)
+            Nx = self.cprec   # mesh points in x-direction
+            Ny = self.cprec   # mesh points in y-direction
+            Xm, Ym, Z = JS_gridsui(func,Nx,Ny,xlimsu,ylimsu)
+            
+            levels = np.array([0,1,2])
+            self.ax.contourf(Xm,Ym,Z,levels=levels,colors=('w', 'b'))
+            # Store some values to see if we have to update
+            self.cpre0 = self.cprec
+            self.xaxes0 = xaxes
+            self.yaxes0 = yaxes
+            # Draw on the canvas
+            self.canvas.draw() 
+
+    # function where user can enter number of pixels in x and y direction
+    def NxNy(self,event):
+        ''' Set precision '''
+        self.statusbar.SetStatusText("")
+        precBox = wx.TextEntryDialog(None, 'Number of Pixels', 'Enter number', '')
+
+        if precBox.ShowModal() == wx.ID_OK:
+            self.cprec = int(precBox.GetValue())
+            if self.cprec < 2:
+                self.statusbar.SetStatusText("Please select a meaningful Number")
+                self.OnError()
+                self.cprec = 100
+
+    # set x and y range
+    def xylims(self,event):
+        self.statusbar.SetStatusText("")
+        xlimBox = wx.TextEntryDialog(None, 'x limits (f.e. -2,2)', 'Enter number (delimiter is ,)', '')
+        if  xlimBox.ShowModal() == wx.ID_OK:
+            x_lims = str(xlimBox.GetValue())
+            x_lims = x_lims.split(',')
+            xmin = float(x_lims[0])
+            xmax = float(x_lims[1])
+            self.xlims = np.array([xmin,xmax])
+        
+            
+        ylimBox = wx.TextEntryDialog(None, 'y limits (f.e. -2,2)', 'Enter number (delimiter is ,)', '')
+        if ylimBox.ShowModal() == wx.ID_OK:
+            y_lims = str(ylimBox.GetValue())
+            y_lims = y_lims.split(',')
+            ymin = float(y_lims[0])
+            ymax = float(y_lims[1])
+            self.ylims = np.array([ymin,ymax])
+        
+
 
     # Displays a dialog for what this program is about
     def OnAbout(self,e):
@@ -230,6 +262,13 @@ class CanvasFrame(wx.Frame):
 
         self.figure.savefig('pic.png')
         self.statusbar.SetStatusText("pic.png saved")
+
+    # Display Error message 
+    def OnError(self):
+        # A message dialog box with an Error message. wx.OK is a standard ID in wxWidgets.
+        dlg = wx.MessageDialog( self, "## Error ##", "Please enter a meaningful number", wx.OK)
+        dlg.ShowModal() # Show it
+        dlg.Destroy() # finally destroy it when finished.
 
 # App class
 class App(wx.App):
