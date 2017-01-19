@@ -6,7 +6,7 @@ import sympy as sp
 # the equation z^n-1 for a user input exponent n
 # note: roots are identified by their angles
 
-def JS_grids(n,tol,maxit,Nx=100,Ny=100,xlims=np.array([-2.,2]),ylims=np.array([-2.,2])):
+def JS_grids(n,tol,maxit,Nx=100,Ny=100,xlims=np.array([-2,2]),ylims=np.array([-2,2])):
     # n = exponent of z^n-1=0 
     # tol = tolerance criterium to decide if the Newton iteration has converged
     # maxit = maximal number of iterations
@@ -18,8 +18,8 @@ def JS_grids(n,tol,maxit,Nx=100,Ny=100,xlims=np.array([-2.,2]),ylims=np.array([-
 
     # expand (x+Iy)^3 and return real and imaginary part and create
     # symbolic functions
-    F1 = sp.utilities.lambdify( (x,y), sp.re(sp.expand((x+sp.I*y)**n-1)))
-    F2 = sp.utilities.lambdify( (x,y), sp.im(sp.expand((x+sp.I*y)**n-1)))
+    F1 = sp.utilities.lambdify( (x,y), sp.re(sp.expand((x+sp.I*y)**n)-1))
+    F2 = sp.utilities.lambdify( (x,y), sp.im(sp.expand((x+sp.I*y)**n)-1))
 
     # compute symbolically components of Jacobian and create symbolic
     # functions
@@ -33,10 +33,11 @@ def JS_grids(n,tol,maxit,Nx=100,Ny=100,xlims=np.array([-2.,2]),ylims=np.array([-
     detDF = lambda x,y: DF11(x,y)*DF22(x,y) - DF21(x,y)*DF12(x,y) 
 
     # set x and y imits for the axis. x is the real plane, y the complex plane
-    xmin = xlims[0]
-    xmax = xlims[1]
-    ymin = ylims[0]
-    ymax = ylims[1]
+    xmin = float(xlims[0])
+    xmax = float(xlims[1])
+    ymin = float(ylims[0])
+    ymax = float(ylims[1])
+
 
     # mesh 
     X,Y = np.ogrid[xmin:xmax:Nx*1j, ymin:ymax:Ny*1j]
@@ -45,7 +46,7 @@ def JS_grids(n,tol,maxit,Nx=100,Ny=100,xlims=np.array([-2.,2]),ylims=np.array([-
     # maximal number of iterations is set by the variable maxit
     X1 = X
     Y1 = Y
-    for i in np.r_[0:maxit+1]:
+    for i in np.r_[0:maxit]:
         X0 = X1
         Y0 = Y1
         X1 = X0 - 1./detDF(X0,Y0)*DF22(X0,Y0)*F1(X0,Y0) + 1./detDF(X0,Y0)*DF12(X0,Y0)*F2(X0,Y0)  
@@ -54,15 +55,11 @@ def JS_grids(n,tol,maxit,Nx=100,Ny=100,xlims=np.array([-2.,2]),ylims=np.array([-
         if np.max(((X1-X0)**2+(Y1-Y0)**2)/(X1**2+Y1**2))<tol:
             break
 
-    #print i, 'Iterations needed'
-    #if np.max(((X1-X0)**2+(Y1-Y0)**2)/(X1**2+Y1**2))>tol:
-    #    print 'Maximal number ('+str(i)+') of iterations reached'
-
 
     # create X,Y,Z read to use with contourf 
     Xm,Ym = np.mgrid[xmin:xmax:Nx*1j, ymin:ymax:Ny*1j]
-    Z = np.angle(X1+1j*Y1)
-    levels = np.linspace(Z.min(),Z.max(),n+1)
+    Z = np.angle(X1+Y1*1j) 
+    levels = np.linspace(0,2*np.pi,2*n)
     return Xm, Ym, Z, levels, i
 
 
