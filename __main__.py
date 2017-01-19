@@ -15,7 +15,7 @@ class CanvasFrame(wx.Frame):
     def __init__(self):
         # Initialize the frame  
         wx.Frame.__init__(self, None, -1,
-                          'Julia Set Plotter v.10', size=(550, 550))
+                          'Julia Set Plotter v.10', size=(550, 750))
         
         # Initialize variables of the Class
         self.statusbar = self.CreateStatusBar() # A Statusbar in the bottom of the window
@@ -131,6 +131,14 @@ class CanvasFrame(wx.Frame):
             entry = entry.replace("i","j")
             f = sympify(entry)
             fs = f.free_symbols
+            # Easy check to see if user input makes sense
+            if len(fs) == 0:
+                self.statusbar.SetStatusText("Error: Enter a variable")
+                return 
+            if len(fs) > 1:
+                self.statusbar.SetStatusText("Error: Enter exactly one variable")
+                return 
+            # lambdify the input
             f = lambdify(fs,f)
             global func
             func = f
