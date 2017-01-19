@@ -15,7 +15,7 @@ class CanvasFrame(wx.Frame):
     def __init__(self):
         # Initialize the frame  
         wx.Frame.__init__(self, None, -1,
-                          'Julia Set Plotter v.10', size=(550, 750))
+                          'Julia Set Plotter v.12', size=(550, 750))
         
         # Initialize variables of the Class
         self.statusbar = self.CreateStatusBar() # A Statusbar in the bottom of the window
