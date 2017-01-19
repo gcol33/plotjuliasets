@@ -97,6 +97,10 @@ class CanvasFrame(wx.Frame):
             value = int(nBox.GetValue())
         if nBox.GetValue() == '':
             self.statusbar.SetStatusText("Error: Enter a number")
+        if value < 1:
+            self.statusbar.SetStatusText("Please select a meaningful Number")
+            self.OnError()
+            return 
         else:
             self.statusbar.SetStatusText("")
             maxit = 50 # number of iterations
@@ -107,7 +111,7 @@ class CanvasFrame(wx.Frame):
             Ny = self.cprec   # mesh points in y-direction
             Xm, Ym, Z, levels, i = JS_grids(self.n,tol,maxit,Nx,Ny,self.xlims,self.ylims)
             
-            self.ax.contourf(Xm,Ym,Z, cmap=plt.cm.get_cmap('jet',len(levels)-1))
+            self.ax.contourf(Xm,Ym,Z,cmap=plt.cm.get_cmap('jet',len(levels)-1))
             # Store some values to see if we have to update
             self.cprec0 = self.cprec
             self.xaxes0 = self.ax.get_xlim()
