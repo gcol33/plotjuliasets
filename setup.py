@@ -2,11 +2,12 @@
 
 from distutils.core import setup
 
-setup(name='packagename',
-      version='packageversion',
-      description='package name',
-      author='your name here',
-      author_email='youremail@....',
-      url='https://github.com/repositoryname/packagename.git',
-      scripts=['packagescript']
+setup(name='plotjuliasets',
+      version='v12',
+      description='plot julia sets',
+      author='gilles colling',
+      author_email='gilcol33@yahoo.de',
+      url='https://github.com/gcol33/plotjuliasets.git',
+      scripts=['plotjuliasets']
      )
+

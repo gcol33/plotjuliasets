@@ -97,6 +97,7 @@ class CanvasFrame(wx.Frame):
             value = int(nBox.GetValue())
         if nBox.GetValue() == '':
             self.statusbar.SetStatusText("Error: Enter a number")
+            return 
         if value < 1:
             self.statusbar.SetStatusText("Please select a meaningful Number")
             self.OnError()
@@ -105,8 +106,8 @@ class CanvasFrame(wx.Frame):
             self.statusbar.SetStatusText("")
             maxit = 50 # number of iterations
             lxy = (len(self.xlims)+len(self.ylims))
-            tol = lxy*1e-4 # toleranz for termination criterium that scales with x and y range
             self.n = value
+            tol = lxy*1e-4    # toleranz for termination criterium that scales with x and y range
             Nx = self.cprec   # mesh points in x-direction
             Ny = self.cprec   # mesh points in y-direction
             Xm, Ym, Z, levels, i = JS_grids(self.n,tol,maxit,Nx,Ny,self.xlims,self.ylims)
@@ -128,7 +129,7 @@ class CanvasFrame(wx.Frame):
     def user_ip(self,event):
         ''' plot some Julia Sets '''
 
-        uiBox = wx.TextEntryDialog(None, 'Iteration for complex variable', 'f(z) = ?', '')
+        uiBox = wx.TextEntryDialog(None, 'Iteration for complex variable\ntipp: try z^2+const.', 'f(z) = ?', '')
 
         if uiBox.ShowModal() == wx.ID_OK:
             entry = str(uiBox.GetValue())

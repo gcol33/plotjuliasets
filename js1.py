@@ -1,4 +1,5 @@
 import numpy as np
+from numpy import pi
 import sympy as sp
 
 # Definition of a function that returns meshgrids X, Y, Z read to use with contourfplot 
@@ -59,7 +60,8 @@ def JS_grids(n,tol,maxit,Nx=100,Ny=100,xlims=np.array([-2,2]),ylims=np.array([-2
     # create X,Y,Z read to use with contourf 
     Xm,Ym = np.mgrid[xmin:xmax:Nx*1j, ymin:ymax:Ny*1j]
     Z = np.angle(X1+Y1*1j) 
-    levels = np.linspace(0,2*np.pi,2*n)
+    levels = np.linspace(0+pi/n,2*pi+pi/n,n*2)
+
     return Xm, Ym, Z, levels, i
 
 

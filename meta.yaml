@@ -1,29 +1,47 @@
 package:
-  name: packagename
-  version: versionofpackage
+  name: plotjuliasets
+  version: "0.12.1"
 
 source:
   git_rev: gitversion
-  git_url: https://github.com/repositoryname/packagename.git
+  git_url: https://github.com/gcol33/plotjuliasets.git
+
 
 requirements:
   build:
     - python
     - setuptools
-    - numpy
 
   run:
     - python
     - numpy
+    - scipy
     - wxpython
 
-    
 test:
   imports:
-    - packagename
+    - plotjuliasets
+
+  commands:
+    # You can put test commands to be run here.  Use this to test that the
+    # entry points work.
+
+    - pyinstrument --help
+
+  # You can also put a file called run_test.py in the recipe that will be run
+  # at test time.
+
+  # requires:
+    # Put any additional test requirements here.  For example
+    # - nose
 
 about:
-  home: https://github.com/repositoryname/packagename
+  home: https://github.com/gcol33/plotjuliasets.git
   license: GPL3
   license_file: LICENSE
-  description: 'The package displays ...'
+  description: 'The package displays julia sets'
+
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml
