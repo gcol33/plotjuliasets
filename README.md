@@ -1,62 +1,94 @@
-# plotjuliasets
+# Julia Sets Explorer
 
-Description
+A modern, high-performance fractal visualization tool built with **Rust** and **Tauri + Svelte**.
 
-The code runs with Python 2.x since its uses wxpython (not
-yet officially ported to Python 3).
-The code has been developed on Mac Os Sierra.
+This is a complete rewrite of the original Python 2.x wxPython application, now featuring a blazing-fast Rust backend with parallel computation and a sleek, modern web-based UI.
 
-This code lets you plot Julia sets for the vectorial newton iteration that solves the equation z^n = 1 
-for a user input number n. Each root is made a different color by identifying the different angles to 
-where our points converged to. The code also lets you enter some custom iteration (but without a differential 
-opeator like the one we need in the newton iteration) f(z) which is parsed by scipy and then transformed 
-into a function with lambdify- to see where it converges if we apply it "infinitely many times" 
-(in the code it applies it 30 times). You can change the real and imaginary range (default is 
-(-2,2)x(-2,2)*i) and also the number of steps which I called precision. Finally you can update 
-the graph after zooming in with the entered precision (the default is 100).
+## Features
 
-How to use:
-- buttons:
-    1. newton iteration
-        this button lets you put in a number n for the equation z^n-1=0 that is then solved with a vectorized newton iteration. Each root is colored differently
-    2. enter iteration
-        this button lets you enter an iteration f(z) and plot the corresponding julia set. f cannot depend on any derivates. Any constants can 
-        be entered as a+bi or a+bj or complex(a,b) or a or bi or bj.
-    3. update
-        updates the graph after you changed the precsion or if you zoomed in
-    4. precision
-        lets you input a number of points in the real and the imaginary direction you want to have in your grid
-    5. range
-        lets you select your range for the initial plot
-- toolbar:
-    the default matplotlib toolbar
-- statusbar (bottom of the window):
-    shows the current status
-- menu:
-    let's you save a picture quickly with Crtl+s as pic.png in the current folder
+- **Three Fractal Types:**
+  - **Newton Fractal** - Visualizes convergence of Newton's method for z^n - 1 = 0
+  - **Julia Set** - Classic z² + c iteration with customizable constant c
+  - **Mandelbrot Set** - The famous Mandelbrot set with cardioid/bulb optimization
 
+- **Interactive Zoom:**
+  - Click and drag to select a region to zoom into
+  - Hold **Shift** while dragging for square selection
+  - Zoom slider (1x - 1000x)
+  - Reset to Square button for returning to default view
 
-INSTALLATION NOTES
+- **Customizable Colors:**
+  - Three color pickers: Start color, End color, Inside set color
+  - Six built-in presets: Classic, Neon, Grayscale, Matrix, Sunset, Royal
 
-To install the code in your computer, you need first to install the anaconda
-python (https://www.continuum.io/downloads).
-You will have to use the Python 2.x distribution since the code
-uses wxpython which is still not ported to Python 3.
+- **High Performance:**
+  - Parallel computation using Rayon
+  - Smooth coloring using normalized iteration count (eliminates banding)
+  - Periodicity detection for faster rendering of interior points
+  - Cardioid/bulb check for Mandelbrot optimization
+  - Resolution up to 4000x4000 pixels
+  - Up to 10,000 iterations
 
+## Tech Stack
 
-Then clone the repository:
+- **Backend:** Rust with Tauri 2.0
+- **Frontend:** Svelte 5 with TypeScript
+- **Computation:** num-complex, Rayon (parallel processing)
+- **Build:** Vite, Cargo
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org/) (v18+)
+- [Rust](https://rustup.rs/) (latest stable)
+- Platform-specific dependencies for Tauri (see [Tauri Prerequisites](https://tauri.app/v1/guides/getting-started/prerequisites))
+
+## Installation
+
+```bash
+# Clone the repository
 git clone https://github.com/gcol33/plotjuliasets.git
+cd plotjuliasets/julia-sets
 
-Build the conda package:
-conda build plotjuliasets
+# Install dependencies
+npm install
 
-And install it locally:
+# Run in development mode
+npm run tauri dev
 
-conda install --use-local sospex
+# Build for production
+npm run tauri build
+```
 
-At this point you can start the code everywhere by
-typing:
+## Usage
 
-plotjuliasets
+1. **Select a fractal type** from the dropdown menu
+2. **Adjust parameters:**
+   - For Newton: set the exponent n
+   - For Julia: set the complex constant c (real and imaginary parts)
+3. **Set resolution and iterations** using the sliders
+4. **Choose colors** using the color pickers or select a preset
+5. **Click "Compute"** to generate the fractal
+6. **Zoom in** by clicking and dragging on the canvas (hold Shift for square selection)
 
-since the executable is in the ~/anaconda/bin directory.
+## Project Structure
+
+```
+julia-sets/
+├── src/                    # Svelte frontend
+│   └── routes/
+│       └── +page.svelte    # Main UI component
+├── src-tauri/
+│   ├── src/
+│   │   └── lib.rs          # Rust backend (fractal computation)
+│   ├── Cargo.toml          # Rust dependencies
+│   └── tauri.conf.json     # Tauri configuration
+└── package.json            # Node dependencies
+```
+
+## Legacy Version
+
+The original Python 2.x version using wxPython and matplotlib is preserved in the repository root for reference. The new Rust version offers significantly better performance and a more modern user experience.
+
+## License
+
+MIT
