@@ -33,6 +33,15 @@
   let color2 = $state("#ff0000"); // End color (red)
   let insideColor = $state("#000000"); // Color for points inside the set
 
+  // Debounced compute for color changes
+  let colorDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+  function debouncedCompute() {
+    if (colorDebounceTimer) clearTimeout(colorDebounceTimer);
+    colorDebounceTimer = setTimeout(() => {
+      compute();
+    }, 300);
+  }
+
   // Helper to convert hex to RGB array
   function hexToRgb(hex: string): [number, number, number] {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -466,15 +475,15 @@
       <div class="color-row">
         <label class="color-label">
           Start
-          <input type="color" bind:value={color1} onchange={compute} />
+          <input type="color" bind:value={color1} oninput={debouncedCompute} />
         </label>
         <label class="color-label">
           End
-          <input type="color" bind:value={color2} onchange={compute} />
+          <input type="color" bind:value={color2} oninput={debouncedCompute} />
         </label>
         <label class="color-label">
           Inside
-          <input type="color" bind:value={insideColor} onchange={compute} />
+          <input type="color" bind:value={insideColor} oninput={debouncedCompute} />
         </label>
       </div>
       <div class="color-presets">
